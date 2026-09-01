@@ -13,26 +13,32 @@
 const MANGA_DATA = {
   series: [
     {
-      id: "s01",
-      title: "花期",
-      original: "花期 / はなどき",
-      author: "示例原作 · 汉化：你自己",
-      tags: ["百合", "短篇集", "日译中"],
-      cover: "assets/img/covers/s01.svg",
+      id: "【やとさきはる】两人的理想世界",
+      title: "【やとさきはる】两人的理想世界 #1",
+      original: "两人的理想世界 / やとさきはる",
+      author: "やとさきはる",
+      tags: ["百合"],
+      cover: "assets/img/covers/二人のアルカディア【合本版】 - 001.jpg",
       description:
-        "关于两个女孩子在同一片花田里错开又重叠的四个季节。示例数据，替换为你自己的作品简介。",
+        "简介",
       chapters: [
         {
-          id: "c01",
-          title: "第1话　初见",
-          pageCount: 5,
-          date: "2026-06-02",
+          id: "【やとさきはる】两人的理想世界 #1",
+          title: "两人的理想世界 #1",
+          pageCount: 24,
+          date: "2026-08-04",
         },
         {
-          id: "c02",
-          title: "第2话　梅雨",
-          pageCount: 4,
-          date: "2026-07-10",
+          id: "【やとさきはる】两人的理想世界 #2",
+          title: "两人的理想世界 #2",
+          pageCount: 20,
+          date: "2026-08-08",
+        },
+        {
+          id: "【やとさきはる】两人的理想世界 #3",
+          title: "两人的理想世界 #3",
+          pageCount: 20,
+          date: "2026-08-11",
         },
       ],
     },

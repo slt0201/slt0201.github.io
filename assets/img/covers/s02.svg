@@ -1,7 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 420">
-<rect width="300" height="420" fill="#FAFAF7"/>
-<rect x="0.5" y="0.5" width="299" height="419" fill="none" stroke="#D8D6D0"/>
-<line x1="30" y1="60" x2="270" y2="60" stroke="#3F5A52" stroke-width="1.5"/>
-<text x="150" y="220" font-family="'Shippori Mincho','Noto Serif SC',serif" font-size="34" fill="#1A1A1F" text-anchor="middle" writing-mode="vertical-rl">潮见坂</text>
-<line x1="30" y1="360" x2="270" y2="360" stroke="#D8D6D0" stroke-width="1"/>
-</svg>
