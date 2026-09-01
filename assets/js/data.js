@@ -6,7 +6,7 @@ const MANGA_DATA = {
       original: "二人のアルカディア",
       author: "やとさきはる",
       tags: ["百合"],
-      cover: "assets/img/covers/二人のアルカ迪ア【合本版】 - 001.jpg",
+      cover: "assets/img/covers/二人のアルカディア【合本版】 - 001.jpg",
       description: "老漫画挖坟",
 
       chapters: [
@@ -37,7 +37,7 @@ const MANGA_DATA = {
       original: "教室",
       author: "森永みるく",
       tags: ["百合"],
-      cover: "assets/img/covers/083",
+      cover: "assets/img/covers/083.jpg",
       description: "季刊ガレツト",
 
       chapters: [
