@@ -9,53 +9,160 @@
 <link rel="icon" href="assets/img/favicon.png">
 <link rel="stylesheet" href="assets/css/style.css">
 </head>
+
 <body data-page="home">
 
-<header class="site-head">
-  <div class="wrap">
-    <div>
-      <p class="site-title"><a href="index.html">备忘录</a></p>
-      <p class="site-tagline">翻译与收藏的漫画备份</p>
+<div id="app">
+
+  <header class="site-head">
+    <div class="wrap">
+      <div>
+        <p class="site-title">
+          <a href="index.html">备忘录</a>
+        </p>
+
+        <p class="site-tagline">
+          翻译与收藏的漫画备份
+        </p>
+      </div>
+
+      <nav class="site-nav">
+        <a href="index.html">存档</a>
+      </nav>
     </div>
-    <nav class="site-nav">
-      <a href="index.html">存档</a>
-    </nav>
-  </div>
-</header>
-
-<main>
-  <div class="wrap">
-    <p class="section-label" id="catalog-count">收录中</p>
-    <ul class="catalog" id="catalog-list"></ul>
-  </div>
-</main>
-
-<footer class="site-foot">
-  <div class="wrap">
-    仅供个人存档与交流使用，请勿二次商用转载！
-  </div>
-</footer>
+  </header>
 
 
-<!-- 音乐播放器 -->
-<div class="music-player" id="music-player">
-  <audio id="music-audio" preload="metadata"></audio>
-  <div class="music-main">
-    <button class="music-icon-btn" id="music-prev" type="button" aria-label="上一首">‹</button>
-    <button class="music-play" id="music-play" type="button" aria-label="播放">▶</button>
-    <button class="music-icon-btn" id="music-next" type="button" aria-label="下一首">›</button>
-    <div class="music-info">
-      <span class="music-label">MUSIC</span>
-      <span class="music-title" id="music-title">暂无音乐</span>
-      <input class="music-progress" id="music-progress" type="range" min="0" max="100" value="0" step="0.1" aria-label="播放进度">
+  <main id="app-main">
+
+    <div class="wrap">
+
+      <p
+        class="section-label"
+        id="catalog-count"
+      >
+        收录中
+      </p>
+
+      <ul
+        class="catalog"
+        id="catalog-list"
+      ></ul>
+
     </div>
-    <input class="music-volume" id="music-volume" type="range" min="0" max="1" value="0.7" step="0.01" aria-label="音量">
-    <button class="music-toggle" id="music-toggle" type="button" aria-label="收起音乐播放器">×</button>
-  </div>
+
+  </main>
+
+
+  <footer class="site-foot">
+    <div class="wrap">
+      仅供个人存档与交流使用，请勿二次商用转载！
+    </div>
+  </footer>
+
 </div>
 
-<script src="assets/js/music-player.js"></script>
+
+<!-- 全站唯一音乐播放器 -->
+
+<div
+  class="music-player"
+  id="music-player"
+>
+
+  <audio
+    id="music-audio"
+    preload="metadata"
+  ></audio>
+
+  <div class="music-main">
+
+    <button
+      class="music-icon-btn"
+      id="music-prev"
+      type="button"
+      aria-label="上一首"
+    >
+      ‹
+    </button>
+
+    <button
+      class="music-play"
+      id="music-play"
+      type="button"
+      aria-label="播放"
+    >
+      ▶
+    </button>
+
+    <button
+      class="music-icon-btn"
+      id="music-next"
+      type="button"
+      aria-label="下一首"
+    >
+      ›
+    </button>
+
+    <div class="music-info">
+
+      <span class="music-label">
+        MUSIC
+      </span>
+
+      <span
+        class="music-title"
+        id="music-title"
+      >
+        暂无音乐
+      </span>
+
+      <input
+        class="music-progress"
+        id="music-progress"
+        type="range"
+        min="0"
+        max="100"
+        value="0"
+        step="0.1"
+        aria-label="播放进度"
+      >
+
+    </div>
+
+    <input
+      class="music-volume"
+      id="music-volume"
+      type="range"
+      min="0"
+      max="1"
+      value="0.7"
+      step="0.01"
+      aria-label="音量"
+    >
+
+    <button
+      class="music-toggle"
+      id="music-toggle"
+      type="button"
+      aria-label="收起音乐播放器"
+    >
+      ×
+    </button>
+
+  </div>
+
+</div>
+
+
+<!-- JS -->
+
 <script src="assets/js/data.js"></script>
+<script src="assets/js/music-player.js"></script>
 <script src="assets/js/render-home.js"></script>
+<script src="assets/js/render-series.js"></script>
+<script src="assets/js/render-reader.js"></script>
+<script src="assets/js/site-router.js"></script>
+
 </body>
 </html>

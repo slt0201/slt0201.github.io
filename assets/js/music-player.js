@@ -1,19 +1,17 @@
 /* ==========================================================================
-   音乐播放器
-   把音乐文件放进 assets/music/，然后在 PLAYLIST 里填写文件名即可。
-   支持 mp3 / ogg / wav 等浏览器支持的音频格式。
+   全站音乐播放器
    ========================================================================== */
 
 const PLAYLIST = [
   { title: "ここでファーストキッス", file: "ここでファーストキッス.mp3" },
   { title: "モブノデレラ", file: "モブノデレラ.mp3" },
   { title: "星が消えないうちに", file: "星が消えないうちに.mp3" },
-  { title: "殺してぇ", file: "殺してぇ.mp3" },
   { title: "私の悪夢でいて", file: "私の悪夢でいて.mp3" }
 ];
 
 (function () {
   const player = document.getElementById("music-player");
+
   if (!player) return;
 
   const audio = player.querySelector("#music-audio");
@@ -24,112 +22,435 @@ const PLAYLIST = [
   const progress = player.querySelector("#music-progress");
   const volume = player.querySelector("#music-volume");
   const toggleBtn = player.querySelector("#music-toggle");
-  const body = document.body;
 
-  let index = Number(localStorage.getItem("music-index") || 0);
-  if (!Number.isFinite(index) || index < 0 || index >= PLAYLIST.length) index = 0;
+  let index = Number(
+    localStorage.getItem("music-index") || 0
+  );
+
+  if (
+    !Number.isFinite(index) ||
+    index < 0 ||
+    index >= PLAYLIST.length
+  ) {
+    index = 0;
+  }
+
+  let savedTime = Number(
+    localStorage.getItem("music-time") || 0
+  );
+
+  const savedVolume =
+    localStorage.getItem("music-volume");
+
+  const wasPlaying =
+    localStorage.getItem("music-playing") === "true";
+
+
+  // ==========================================================
+  // 基础
+  // ==========================================================
 
   function hasTracks() {
     return PLAYLIST.length > 0;
   }
 
+
   function updateTitle() {
     if (!hasTracks()) {
       titleEl.textContent = "暂无音乐";
+
       playBtn.disabled = true;
       prevBtn.disabled = true;
       nextBtn.disabled = true;
       progress.disabled = true;
+
       return;
     }
 
-    titleEl.textContent = PLAYLIST[index].title;
+    titleEl.textContent =
+      PLAYLIST[index].title;
+
     playBtn.disabled = false;
-    prevBtn.disabled = PLAYLIST.length < 2;
-    nextBtn.disabled = PLAYLIST.length < 2;
+    prevBtn.disabled =
+      PLAYLIST.length < 2;
+    nextBtn.disabled =
+      PLAYLIST.length < 2;
   }
 
-  function loadTrack(autoplay = false) {
+
+  // ==========================================================
+  // 播放器 UI
+  // ==========================================================
+
+  function setPlayingUI() {
+    const playing = !audio.paused;
+
+    playBtn.textContent =
+      playing ? "Ⅱ" : "▶";
+
+    playBtn.setAttribute(
+      "aria-label",
+      playing ? "暂停" : "播放"
+    );
+
+    player.classList.toggle(
+      "is-playing",
+      playing
+    );
+
+    localStorage.setItem(
+      "music-playing",
+      String(playing)
+    );
+  }
+
+
+  // ==========================================================
+  // 保存播放位置
+  // ==========================================================
+
+  function savePosition() {
+    if (!hasTracks()) return;
+
+    localStorage.setItem(
+      "music-index",
+      String(index)
+    );
+
+    if (
+      Number.isFinite(audio.currentTime)
+    ) {
+      localStorage.setItem(
+        "music-time",
+        String(audio.currentTime)
+      );
+    }
+  }
+
+
+  // ==========================================================
+  // 加载歌曲
+  // ==========================================================
+
+  function loadTrack(
+    autoplay = false,
+    restoreTime = true
+  ) {
     if (!hasTracks()) {
       updateTitle();
       return;
     }
 
-    const track = PLAYLIST[index];
-    audio.src = "assets/music/" + encodeURI(track.file);
-    audio.load();
-    titleEl.textContent = track.title;
-    localStorage.setItem("music-index", String(index));
+    const track =
+      PLAYLIST[index];
 
-    if (autoplay) {
+    audio.src =
+      "assets/music/" +
+      encodeURI(track.file);
+
+    audio.load();
+
+    titleEl.textContent =
+      track.title;
+
+    localStorage.setItem(
+      "music-index",
+      String(index)
+    );
+
+    if (restoreTime && savedTime > 0) {
+      const restore = () => {
+        if (
+          Number.isFinite(audio.duration) &&
+          audio.duration > 0
+        ) {
+          audio.currentTime =
+            Math.min(
+              savedTime,
+              audio.duration
+            );
+        }
+
+        audio.removeEventListener(
+          "loadedmetadata",
+          restore
+        );
+
+        if (autoplay) {
+          audio.play().catch(() => {});
+        }
+      };
+
+      audio.addEventListener(
+        "loadedmetadata",
+        restore
+      );
+    } else if (autoplay) {
       audio.play().catch(() => {});
     }
   }
 
-  function setPlayingUI() {
-    playBtn.textContent = audio.paused ? "▶" : "Ⅱ";
-    playBtn.setAttribute("aria-label", audio.paused ? "播放" : "暂停");
-    player.classList.toggle("is-playing", !audio.paused);
+
+  // ==========================================================
+  // 播放 / 暂停
+  // ==========================================================
+
+  playBtn.addEventListener(
+    "click",
+    function () {
+      if (!hasTracks()) return;
+
+      if (audio.paused) {
+        audio.play().catch(() => {});
+      } else {
+        audio.pause();
+      }
+    }
+  );
+
+
+  // ==========================================================
+  // 上一首
+  // ==========================================================
+
+  prevBtn.addEventListener(
+    "click",
+    function () {
+      if (!hasTracks()) return;
+
+      index =
+        (index - 1 + PLAYLIST.length) %
+        PLAYLIST.length;
+
+      savedTime = 0;
+
+      localStorage.setItem(
+        "music-time",
+        "0"
+      );
+
+      loadTrack(true, false);
+    }
+  );
+
+
+  // ==========================================================
+  // 下一首
+  // ==========================================================
+
+  nextBtn.addEventListener(
+    "click",
+    function () {
+      if (!hasTracks()) return;
+
+      index =
+        (index + 1) %
+        PLAYLIST.length;
+
+      savedTime = 0;
+
+      localStorage.setItem(
+        "music-time",
+        "0"
+      );
+
+      loadTrack(true, false);
+    }
+  );
+
+
+  // ==========================================================
+  // 播放事件
+  // ==========================================================
+
+  audio.addEventListener(
+    "play",
+    function () {
+      setPlayingUI();
+      savePosition();
+    }
+  );
+
+
+  audio.addEventListener(
+    "pause",
+    function () {
+      setPlayingUI();
+      savePosition();
+    }
+  );
+
+
+  // ==========================================================
+  // 播放结束 → 下一首
+  // ==========================================================
+
+  audio.addEventListener(
+    "ended",
+    function () {
+      if (!hasTracks()) return;
+
+      index =
+        (index + 1) %
+        PLAYLIST.length;
+
+      savedTime = 0;
+
+      localStorage.setItem(
+        "music-time",
+        "0"
+      );
+
+      loadTrack(true, false);
+    }
+  );
+
+
+  // ==========================================================
+  // 播放进度
+  // ==========================================================
+
+  audio.addEventListener(
+    "timeupdate",
+    function () {
+      if (!audio.duration) return;
+
+      progress.value =
+        String(
+          (audio.currentTime /
+            audio.duration) *
+          100
+        );
+
+      savePosition();
+    }
+  );
+
+
+  progress.addEventListener(
+    "input",
+    function () {
+      if (!audio.duration) return;
+
+      audio.currentTime =
+        (Number(progress.value) / 100) *
+        audio.duration;
+
+      savePosition();
+    }
+  );
+
+
+  // ==========================================================
+  // 音量
+  // ==========================================================
+
+  volume.value =
+    savedVolume || "0.7";
+
+  audio.volume =
+    Number(volume.value);
+
+  volume.addEventListener(
+    "input",
+    function () {
+      audio.volume =
+        Number(volume.value);
+
+      localStorage.setItem(
+        "music-volume",
+        volume.value
+      );
+    }
+  );
+
+
+  // ==========================================================
+  // 收起播放器
+  // ==========================================================
+
+  function updateCollapsedUI(
+    collapsed
+  ) {
+    player.classList.toggle(
+      "is-collapsed",
+      collapsed
+    );
+
+    toggleBtn.textContent =
+      collapsed ? "♪" : "×";
+
+    toggleBtn.setAttribute(
+      "aria-label",
+      collapsed
+        ? "展开音乐播放器"
+        : "收起音乐播放器"
+    );
   }
 
-  playBtn.addEventListener("click", () => {
-    if (!hasTracks()) return;
-    if (audio.paused) audio.play().catch(() => {});
-    else audio.pause();
-  });
 
-  prevBtn.addEventListener("click", () => {
-    if (!hasTracks()) return;
-    index = (index - 1 + PLAYLIST.length) % PLAYLIST.length;
-    loadTrack(true);
-  });
+  toggleBtn.addEventListener(
+    "click",
+    function () {
+      const collapsed =
+        player.classList.toggle(
+          "is-collapsed"
+        );
 
-  nextBtn.addEventListener("click", () => {
-    if (!hasTracks()) return;
-    index = (index + 1) % PLAYLIST.length;
-    loadTrack(true);
-  });
+      localStorage.setItem(
+        "music-collapsed",
+        String(collapsed)
+      );
 
-  audio.addEventListener("play", setPlayingUI);
-  audio.addEventListener("pause", setPlayingUI);
-  audio.addEventListener("ended", () => {
-    if (!hasTracks()) return;
-    index = (index + 1) % PLAYLIST.length;
-    loadTrack(true);
-  });
+      updateCollapsedUI(
+        collapsed
+      );
+    }
+  );
 
-  audio.addEventListener("timeupdate", () => {
-    if (!audio.duration) return;
-    progress.value = String((audio.currentTime / audio.duration) * 100);
-  });
 
-  progress.addEventListener("input", () => {
-    if (!audio.duration) return;
-    audio.currentTime = (Number(progress.value) / 100) * audio.duration;
-  });
-
-  volume.value = localStorage.getItem("music-volume") || "0.7";
-  audio.volume = Number(volume.value);
-  volume.addEventListener("input", () => {
-    audio.volume = Number(volume.value);
-    localStorage.setItem("music-volume", volume.value);
-  });
-
-  toggleBtn.addEventListener("click", () => {
-    const hidden = player.classList.toggle("is-collapsed");
-    localStorage.setItem("music-collapsed", String(hidden));
-    toggleBtn.textContent = hidden ? "♪" : "×";
-    toggleBtn.setAttribute("aria-label", hidden ? "展开音乐播放器" : "收起音乐播放器");
-  });
-
-  if (localStorage.getItem("music-collapsed") === "true") {
-    player.classList.add("is-collapsed");
-    toggleBtn.textContent = "♪";
-    toggleBtn.setAttribute("aria-label", "展开音乐播放器");
+  if (
+    localStorage.getItem(
+      "music-collapsed"
+    ) === "true"
+  ) {
+    updateCollapsedUI(true);
   }
 
-  // 阅读器切换页面时也保持播放器状态；浏览器刷新后不会自动播放，这是浏览器的限制。
+
+  // ==========================================================
+  // 页面离开前保存状态
+  // ==========================================================
+
+  window.addEventListener(
+    "beforeunload",
+    savePosition
+  );
+
+  document.addEventListener(
+    "visibilitychange",
+    function () {
+      if (
+        document.visibilityState ===
+        "hidden"
+      ) {
+        savePosition();
+      }
+    }
+  );
+
+
+  // ==========================================================
+  // 初始化
+  // ==========================================================
+
   updateTitle();
-  loadTrack(false);
+
+  loadTrack(
+    false,
+    true
+  );
+
   setPlayingUI();
+
 })();

@@ -1,110 +1,424 @@
-(function () {
-  const stage = document.getElementById("reader-stage");
-  const titleEl = document.getElementById("reader-title");
-  const indicatorEl = document.getElementById("page-indicator");
-  const backEl = document.getElementById("reader-back");
-  const modeBtn = document.getElementById("mode-toggle");
+/* ==========================================================================
+   阅读器
+   由 site-router.js 调用
+   音乐播放器不参与页面切换，因此不会中断
+   ========================================================================== */
 
-  // 获取 URL 参数
-  const params = new URLSearchParams(location.search);
-  const seriesId = params.get("series");
-  const chapterId = params.get("chapter");
+window.renderReader = function (seriesId, chapterId) {
 
-  const found =
-    seriesId && chapterId
-      ? findChapter(seriesId, chapterId)
-      : null;
+  const appMain = document.getElementById("app-main");
 
-  // 找不到章节
-  if (!found) {
-    titleEl.textContent = "没找到这一话";
+  if (!appMain) return;
 
-    stage.innerHTML = `
-      <p class="reader-end">
-        没找到这一话。<br>
-        <a href="index.html">回到全部系列</a>
-      </p>
+
+  // ==========================================================
+  // 找到系列和章节
+  // ==========================================================
+
+  const result = findChapter(
+    seriesId,
+    chapterId
+  );
+
+  if (!result) {
+
+    appMain.innerHTML = `
+      <div class="reader-bar">
+        <a href="index.html" id="reader-back">
+          ← 系列
+        </a>
+
+        <p class="reader-title">
+          没找到这一话
+        </p>
+
+        <div class="reader-controls"></div>
+      </div>
+
+      <div class="reader-stage paged">
+        <p class="reader-end">
+          没找到这一话。<br>
+          <a href="index.html">
+            回到全部系列
+          </a>
+        </p>
+      </div>
     `;
 
     return;
   }
 
-  const { series, chapter } = found;
 
-  const chapterIndex = series.chapters.findIndex(
-    (c) => c.id === chapter.id
-  );
+  let series = result.series;
+  let chapter = result.chapter;
 
-  const prevChapter =
-    series.chapters[chapterIndex - 1] || null;
+  let pages =
+    chapterPageUrls(
+      series.id,
+      chapter
+    );
 
-  const nextChapter =
-    series.chapters[chapterIndex + 1] || null;
+  let current = 1;
 
-  // 获取这一话的所有图片
-  const pages = chapterPageUrls(series.id, chapter);
+  let mode =
+    localStorage.getItem("reader-mode")
+    || "paged";
 
-  // 返回系列页
-  backEl.href =
-    `series.html?series=${encodeURIComponent(series.id)}`;
 
-  // 阅读器标题
-  titleEl.textContent =
-    `${series.title} · ${chapter.title}`;
+  // ==========================================================
+  // 阅读器界面
+  // ==========================================================
+
+  appMain.innerHTML = `
+
+    <div class="reader-bar">
+
+      <a
+        href="series.html?series=${encodeURIComponent(series.id)}"
+        id="reader-back"
+      >
+        ← 系列
+      </a>
+
+      <p
+        class="reader-title"
+        id="reader-title"
+      >
+        ${series.title} · ${chapter.title}
+      </p>
+
+      <div class="reader-controls">
+
+        <span
+          class="page-indicator"
+          id="page-indicator"
+        ></span>
+
+        <span class="reading-direction">
+          右→左
+        </span>
+
+        <button
+          class="mode-toggle"
+          id="mode-toggle"
+          type="button"
+          aria-pressed="false"
+        >
+          连续滚动
+        </button>
+
+      </div>
+
+    </div>
+
+
+    <div
+      class="reader-stage paged"
+      id="reader-stage"
+    ></div>
+
+  `;
+
+
+  const stage =
+    document.getElementById(
+      "reader-stage"
+    );
+
+  const titleEl =
+    document.getElementById(
+      "reader-title"
+    );
+
+  const indicatorEl =
+    document.getElementById(
+      "page-indicator"
+    );
+
+  const modeBtn =
+    document.getElementById(
+      "mode-toggle"
+    );
+
 
   document.title =
     `${chapter.title} · ${series.title}`;
 
-  // 读取上次的阅读模式
-  let mode =
-    localStorage.getItem("reader-mode") || "paged";
-
-  // 当前页码
-  let current = 1;
-
 
   // ==========================================================
-  // 阅读模式按钮
+  // 图片加载错误
   // ==========================================================
 
-  function setModeButton() {
-    const isScroll = mode === "scroll";
+  function addImageError(img, src) {
 
-    modeBtn.textContent =
-      isScroll ? "翻页阅读" : "连续滚动";
+    img.addEventListener(
+      "error",
+      function () {
 
-    modeBtn.setAttribute(
-      "aria-pressed",
-      String(isScroll)
+        console.error(
+          "图片加载失败：",
+          src
+        );
+
+        img.alt =
+          "图片加载失败";
+
+        if (
+          img.nextElementSibling &&
+          img.nextElementSibling.classList.contains(
+            "reader-image-error"
+          )
+        ) {
+          return;
+        }
+
+        img.insertAdjacentHTML(
+          "afterend",
+          `
+            <div class="reader-image-error">
+              图片加载失败<br>
+              <small>${src}</small>
+            </div>
+          `
+        );
+
+      }
     );
 
-    stage.className =
-      `reader-stage ${isScroll ? "scroll" : "paged"}`;
   }
 
 
   // ==========================================================
-  // 本话结束提示
+  // 当前章节位置
+  // ==========================================================
+
+  function getChapterIndex() {
+
+    return series.chapters.findIndex(
+      c => c.id === chapter.id
+    );
+
+  }
+
+
+  function getPrevChapter() {
+
+    const index =
+      getChapterIndex();
+
+    return (
+      series.chapters[index - 1]
+      || null
+    );
+
+  }
+
+
+  function getNextChapter() {
+
+    const index =
+      getChapterIndex();
+
+    return (
+      series.chapters[index + 1]
+      || null
+    );
+
+  }
+
+
+  // ==========================================================
+  // 章节 URL
+  // ==========================================================
+
+  function updateURL() {
+
+    const url =
+      `reader.html?series=${encodeURIComponent(series.id)}&chapter=${encodeURIComponent(chapter.id)}`;
+
+    history.pushState(
+      {
+        type: "reader",
+        series: series.id,
+        chapter: chapter.id
+      },
+      "",
+      url
+    );
+
+  }
+
+
+  // ==========================================================
+  // 下一话
+  // ==========================================================
+
+  function goNextChapter() {
+
+    const nextChapter =
+      getNextChapter();
+
+    if (!nextChapter) return;
+
+
+    const result =
+      findChapter(
+        series.id,
+        nextChapter.id
+      );
+
+    if (!result) return;
+
+
+    chapter =
+      result.chapter;
+
+    pages =
+      chapterPageUrls(
+        series.id,
+        chapter
+      );
+
+    current = 1;
+
+
+    updateURL();
+
+
+    updateChapterInfo();
+
+    render();
+
+
+    window.scrollTo(
+      0,
+      0
+    );
+
+  }
+
+
+  // ==========================================================
+  // 上一话
+  // ==========================================================
+
+  function goPrevChapter() {
+
+    const prevChapter =
+      getPrevChapter();
+
+    if (!prevChapter) return;
+
+
+    const result =
+      findChapter(
+        series.id,
+        prevChapter.id
+      );
+
+    if (!result) return;
+
+
+    chapter =
+      result.chapter;
+
+    pages =
+      chapterPageUrls(
+        series.id,
+        chapter
+      );
+
+    current =
+      mode === "paged"
+        ? pages.length
+        : 1;
+
+
+    updateURL();
+
+
+    updateChapterInfo();
+
+    render();
+
+
+    window.scrollTo(
+      0,
+      0
+    );
+
+  }
+
+
+  // ==========================================================
+  // 更新章节信息
+  // ==========================================================
+
+  function updateChapterInfo() {
+
+    const backEl =
+      document.getElementById(
+        "reader-back"
+      );
+
+    backEl.href =
+      `series.html?series=${encodeURIComponent(series.id)}`;
+
+    titleEl.textContent =
+      `${series.title} · ${chapter.title}`;
+
+    document.title =
+      `${chapter.title} · ${series.title}`;
+
+  }
+
+
+  // ==========================================================
+  // 阅读结束
   // ==========================================================
 
   function readerEndBlock() {
-    const nextLink = nextChapter
-      ? `
-        <a href="reader.html?series=${encodeURIComponent(series.id)}&chapter=${encodeURIComponent(nextChapter.id)}">
-          下一话：${nextChapter.title} →
-        </a>
-      `
-      : `
-        <a href="series.html?series=${encodeURIComponent(series.id)}">
-          已经是最后一话，回到系列页
-        </a>
+
+    const nextChapter =
+      getNextChapter();
+
+
+    if (nextChapter) {
+
+      return `
+        <div class="reader-end">
+
+          本话读完。<br>
+
+          <a
+            href="reader.html?series=${encodeURIComponent(series.id)}&chapter=${encodeURIComponent(nextChapter.id)}"
+            class="chapter-next-link"
+            data-series="${series.id}"
+            data-chapter="${nextChapter.id}"
+          >
+            下一话：${nextChapter.title} →
+          </a>
+
+        </div>
       `;
+
+    }
+
 
     return `
       <div class="reader-end">
-        本话读完。${nextLink}
+
+        已经是最后一话。<br>
+
+        <a
+          href="series.html?series=${encodeURIComponent(series.id)}"
+        >
+          回到系列页
+        </a>
+
       </div>
     `;
+
   }
 
 
@@ -113,10 +427,13 @@
   // ==========================================================
 
   function renderPaged() {
+
     indicatorEl.textContent =
       `${current} / ${pages.length}`;
 
+
     stage.innerHTML = `
+
       <img
         class="page-img"
         src="${pages[current - 1]}"
@@ -132,89 +449,114 @@
         class="tap-zone next"
         aria-label="下一页"
       ></div>
+
     `;
 
+
     const img =
-      stage.querySelector(".page-img");
-
-    // 图片加载失败时显示实际路径
-    img.addEventListener("error", function () {
-      console.error(
-        "图片加载失败：",
-        pages[current - 1]
+      stage.querySelector(
+        ".page-img"
       );
 
-      img.alt = "图片加载失败";
+    addImageError(
+      img,
+      pages[current - 1]
+    );
 
-      img.insertAdjacentHTML(
-        "afterend",
-        `
-        <div class="reader-image-error">
-          图片加载失败<br>
-          <small>${pages[current - 1]}</small>
-        </div>
-        `
-      );
-    });
 
-    // 左边区域 → 下一页
     stage
       .querySelector(".tap-zone.prev")
-      .addEventListener("click", goNext);
+      .addEventListener(
+        "click",
+        goNext
+      );
 
-    // 右边区域 → 上一页
+
     stage
       .querySelector(".tap-zone.next")
-      .addEventListener("click", goPrev);
+      .addEventListener(
+        "click",
+        goPrev
+      );
+
   }
 
 
   // ==========================================================
-  // 连续滚动模式
+  // 连续滚动
   // ==========================================================
 
   function renderScroll() {
+
     indicatorEl.textContent =
       `共 ${pages.length} 页`;
 
-    const imgs = pages
-      .map(
-        (src, i) => `
-          <img
-            class="page-img"
-            src="${src}"
-            alt="${chapter.title} 第 ${i + 1} 页"
-            loading="lazy"
-          >
-        `
-      )
-      .join("");
+
+    const imgs =
+      pages
+        .map(
+          (src, i) => `
+            <img
+              class="page-img"
+              src="${src}"
+              alt="${chapter.title} 第 ${i + 1} 页"
+              loading="lazy"
+            >
+          `
+        )
+        .join("");
+
 
     stage.innerHTML =
-      imgs + readerEndBlock();
+      imgs +
+      readerEndBlock();
+
 
     stage
       .querySelectorAll(".page-img")
-      .forEach((img, i) => {
-        img.addEventListener("error", function () {
-          console.error(
-            "图片加载失败：",
+      .forEach(
+        (img, i) => {
+
+          addImageError(
+            img,
             pages[i]
           );
 
-          img.alt = "图片加载失败";
+        }
+      );
 
-          img.insertAdjacentHTML(
-            "afterend",
-            `
-            <div class="reader-image-error">
-              图片加载失败<br>
-              <small>${pages[i]}</small>
-            </div>
-            `
-          );
-        });
-      });
+  }
+
+
+  // ==========================================================
+  // 阅读模式按钮
+  // ==========================================================
+
+  function setModeButton() {
+
+    const isScroll =
+      mode === "scroll";
+
+
+    modeBtn.textContent =
+      isScroll
+        ? "翻页阅读"
+        : "连续滚动";
+
+
+    modeBtn.setAttribute(
+      "aria-pressed",
+      String(isScroll)
+    );
+
+
+    stage.className =
+      `reader-stage ${
+        isScroll
+          ? "scroll"
+          : "paged"
+      }`;
+
   }
 
 
@@ -223,113 +565,164 @@
   // ==========================================================
 
   function render() {
+
     setModeButton();
 
+
     if (mode === "scroll") {
+
       renderScroll();
+
     } else {
+
       renderPaged();
+
     }
+
   }
 
 
   // ==========================================================
-  // 下一页
+  // 翻页
   // ==========================================================
 
   function goNext() {
-    if (mode !== "paged") return;
+
+    if (mode !== "paged") {
+      return;
+    }
+
 
     if (current < pages.length) {
+
       current += 1;
 
       renderPaged();
 
-      window.scrollTo(0, 0);
+      window.scrollTo(
+        0,
+        0
+      );
 
-    } else if (nextChapter) {
-
-      location.href =
-        `reader.html?series=${encodeURIComponent(series.id)}&chapter=${encodeURIComponent(nextChapter.id)}`;
-
-    } else {
-
-      stage.innerHTML =
-        readerEndBlock();
+      return;
     }
+
+
+    goNextChapter();
+
   }
 
 
-  // ==========================================================
-  // 上一页
-  // ==========================================================
-
   function goPrev() {
-    if (mode !== "paged") return;
+
+    if (mode !== "paged") {
+      return;
+    }
+
 
     if (current > 1) {
+
       current -= 1;
 
       renderPaged();
 
-      window.scrollTo(0, 0);
+      window.scrollTo(
+        0,
+        0
+      );
 
-    } else if (prevChapter) {
-
-      location.href =
-        `reader.html?series=${encodeURIComponent(series.id)}&chapter=${encodeURIComponent(prevChapter.id)}`;
+      return;
     }
+
+
+    goPrevChapter();
+
   }
 
 
   // ==========================================================
-  // 切换阅读模式
+  // 模式切换
   // ==========================================================
 
-  modeBtn.addEventListener("click", () => {
-    mode =
-      mode === "paged"
-        ? "scroll"
-        : "paged";
+  modeBtn.addEventListener(
+    "click",
+    function () {
 
-    localStorage.setItem(
-      "reader-mode",
-      mode
-    );
-
-    current = 1;
-
-    render();
-  });
+      mode =
+        mode === "paged"
+          ? "scroll"
+          : "paged";
 
 
-  // ==========================================================
-  // 键盘操作
-  // ==========================================================
+      localStorage.setItem(
+        "reader-mode",
+        mode
+      );
 
-  document.addEventListener("keydown", (e) => {
-    if (mode !== "paged") return;
 
-    if (
-      e.key === "ArrowLeft" ||
-      e.key === " "
-    ) {
-      e.preventDefault();
-      goNext();
+      current = 1;
 
-    } else if (
-      e.key === "ArrowRight"
-    ) {
-      e.preventDefault();
-      goPrev();
+      render();
+
     }
-  });
+  );
 
 
   // ==========================================================
-  // 开始
+  // 键盘
   // ==========================================================
+
+  document.addEventListener(
+    "keydown",
+    function readerKeyboard(e) {
+
+      if (
+        document.body.dataset.page !==
+        "reader"
+      ) {
+        document.removeEventListener(
+          "keydown",
+          readerKeyboard
+        );
+
+        return;
+      }
+
+
+      if (mode !== "paged") {
+        return;
+      }
+
+
+      if (
+        e.key === "ArrowLeft" ||
+        e.key === " "
+      ) {
+
+        e.preventDefault();
+
+        goNext();
+
+      } else if (
+        e.key === "ArrowRight"
+      ) {
+
+        e.preventDefault();
+
+        goPrev();
+
+      }
+
+    }
+  );
+
+
+  // ==========================================================
+  // 初始渲染
+  // ==========================================================
+
+  updateChapterInfo();
 
   render();
 
-})();
+};
