@@ -1,0 +1,788 @@
+/* ==========================================================================
+   漫画备份站 — 基础样式
+   设计基调：安静的纸面感目录，克制的一点强调色，
+   结构靠细线与留白传达，而不是卡片和阴影。
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@400;500;700&family=Noto+Serif+SC:wght@400;600&family=Noto+Sans+SC:wght@300;400;500&display=swap');
+
+:root {
+  --paper: #FAFAF7;
+  --paper-raised: #F3F2ED;
+  --ink: #1A1A1F;
+  --ink-soft: #4B4A47;
+  --muted: #8F8D86;
+  --line: #DEDCD3;
+  --line-strong: #C7C4B8;
+  --accent: #5B3A52;
+  --accent-soft: #8A6A80;
+
+  --serif-jp: 'Shippori Mincho B1', 'Noto Serif SC', serif;
+  --serif-cn: 'Noto Serif SC', serif;
+  --sans: 'Noto Sans SC', -apple-system, 'Hiragino Sans GB', sans-serif;
+
+  --measure: 68ch;
+}
+
+* { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-weight: 300;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+a:focus-visible,
+button:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+img { max-width: 100%; display: block; }
+
+.wrap {
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 0 28px;
+}
+
+/* ---------- 顶部站头 ---------- */
+
+.site-head {
+  padding: 48px 0 36px;
+  border-bottom: 1px solid var(--line);
+}
+
+.site-head .wrap {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.site-title {
+  font-family: var(--serif-jp);
+  font-size: 26px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.site-title a { display: inline-block; }
+
+.site-tagline {
+  font-size: 13px;
+  color: var(--muted);
+  letter-spacing: 0.04em;
+}
+
+.site-nav {
+  font-size: 14px;
+  color: var(--ink-soft);
+}
+
+.site-nav a {
+  border-bottom: 1px solid transparent;
+  padding-bottom: 2px;
+}
+
+.site-nav a:hover { border-bottom-color: var(--accent-soft); }
+
+/* ---------- 首页：书目列表 ---------- */
+
+main { padding: 44px 0 100px; }
+
+.section-label {
+  font-size: 13px;
+  color: var(--muted);
+  margin: 0 0 22px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+}
+
+.catalog {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.catalog-item {
+  display: grid;
+  grid-template-columns: 74px 1fr auto;
+  gap: 22px;
+  align-items: start;
+  padding: 26px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.catalog-item:first-child { padding-top: 4px; }
+
+.catalog-cover {
+  width: 74px;
+  height: 104px;
+  border: 1px solid var(--line-strong);
+  overflow: hidden;
+  background: var(--paper-raised);
+}
+
+.catalog-cover img { width: 100%; height: 100%; object-fit: cover; }
+
+.catalog-body h2 {
+  margin: 0 0 6px;
+  font-family: var(--serif-cn);
+  font-size: 21px;
+  font-weight: 600;
+}
+
+.catalog-body h2 a:hover { color: var(--accent); }
+
+.catalog-meta {
+  margin: 0 0 8px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.catalog-meta span + span::before {
+  content: "";
+  display: inline-block;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--muted);
+  margin: 0 9px;
+  vertical-align: middle;
+}
+
+.catalog-desc {
+  margin: 0;
+  font-size: 14px;
+  color: var(--ink-soft);
+  max-width: 46ch;
+}
+
+.catalog-tags {
+  margin-top: 10px;
+  font-size: 12px;
+  color: var(--accent-soft);
+}
+
+.catalog-tags span { margin-right: 10px; }
+
+.catalog-stat {
+  text-align: right;
+  font-size: 13px;
+  color: var(--muted);
+  white-space: nowrap;
+  padding-top: 4px;
+}
+
+.catalog-stat strong {
+  display: block;
+  font-family: var(--serif-cn);
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+@media (max-width: 560px) {
+  .catalog-item {
+    grid-template-columns: 56px 1fr;
+  }
+  .catalog-stat {
+    grid-column: 1 / -1;
+    text-align: left;
+    padding-top: 0;
+  }
+  .catalog-stat strong { display: inline; margin-right: 6px; }
+}
+
+/* ---------- 系列页 ---------- */
+
+.back-link {
+  display: inline-block;
+  margin-bottom: 28px;
+  font-size: 14px;
+  color: var(--ink-soft);
+  border-bottom: 1px solid var(--line-strong);
+}
+
+.series-head {
+  display: grid;
+  grid-template-columns: 148px 1fr;
+  gap: 32px;
+  padding-bottom: 36px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid var(--line);
+}
+
+.series-cover {
+  width: 148px;
+  height: 208px;
+  border: 1px solid var(--line-strong);
+  overflow: hidden;
+  background: var(--paper-raised);
+}
+
+.series-cover img { width: 100%; height: 100%; object-fit: cover; }
+
+.series-title {
+  font-family: var(--serif-cn);
+  font-size: 32px;
+  font-weight: 600;
+  margin: 0 0 10px;
+}
+
+.series-meta {
+  font-size: 13px;
+  color: var(--muted);
+  margin: 0 0 16px;
+}
+
+.series-meta span + span::before {
+  content: "";
+  display: inline-block;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--muted);
+  margin: 0 9px;
+  vertical-align: middle;
+}
+
+.series-desc {
+  max-width: var(--measure);
+  font-size: 15px;
+  color: var(--ink-soft);
+}
+
+@media (max-width: 560px) {
+  .series-head { grid-template-columns: 96px 1fr; gap: 20px; }
+  .series-cover { width: 96px; height: 134px; }
+  .series-title { font-size: 24px; }
+}
+
+.chapter-list {
+  list-style: none;
+  margin: 24px 0 0;
+  padding: 0;
+}
+
+.chapter-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 17px 4px;
+  border-bottom: 1px solid var(--line);
+}
+
+.chapter-row a {
+  font-size: 16px;
+  color: var(--ink);
+}
+
+.chapter-row a:hover { color: var(--accent); }
+
+.chapter-row .chapter-info {
+  font-size: 13px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+/* ---------- 阅读器 ---------- */
+
+body.reader-page { background: var(--ink); color: var(--paper); }
+
+.reader-bar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 22px;
+  background: rgba(26, 26, 31, 0.92);
+  backdrop-filter: blur(6px);
+  border-bottom: 1px solid #3A3A40;
+  font-size: 13px;
+}
+
+.reader-bar a { color: #C9C7C0; border-bottom: 1px solid transparent; }
+.reader-bar a:hover { border-bottom-color: var(--accent-soft); }
+
+.reader-title {
+  font-family: var(--serif-cn);
+  font-size: 14px;
+  color: var(--paper);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.reader-controls {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  color: #C9C7C0;
+}
+
+.mode-toggle {
+  background: transparent;
+  border: 1px solid #4A4A50;
+  color: #C9C7C0;
+  font-family: var(--sans);
+  font-size: 12px;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+
+.mode-toggle:hover { border-color: var(--accent-soft); color: var(--paper); }
+
+.page-indicator { font-variant-numeric: tabular-nums; color: #C9C7C0; }
+
+/* 翻页模式 */
+
+.reader-stage {
+  min-height: calc(100vh - 54px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.reader-stage.paged .page-img {
+  max-height: calc(100vh - 54px);
+  width: auto;
+  margin: 0 auto;
+}
+
+.tap-zone {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 40%;
+  cursor: pointer;
+}
+
+.tap-zone.prev { left: 0; }
+.tap-zone.next { right: 0; }
+
+/* 连续滚动模式 */
+
+.reader-stage.scroll {
+  display: block;
+  min-height: 0;
+}
+
+.reader-stage.scroll .page-img {
+  width: 100%;
+  max-width: 760px;
+  margin: 0 auto;
+  display: block;
+}
+
+.reader-end {
+  text-align: center;
+  padding: 60px 20px 100px;
+  color: #9C9A94;
+  font-size: 14px;
+}
+
+.reader-end a {
+  color: var(--paper);
+  border-bottom: 1px solid var(--accent-soft);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { scroll-behavior: auto !important; }
+}
+
+/* ---------- 空状态 ---------- */
+
+.empty-state {
+  padding: 60px 0;
+  color: var(--muted);
+  font-size: 14px;
+  border-bottom: 1px solid var(--line);
+}
+
+/* ---------- 页脚 ---------- */
+
+.site-foot {
+  padding: 30px 0 60px;
+  font-size: 12px;
+  color: var(--muted);
+  border-top: 1px solid var(--line);
+}
+
+
+/* ---------- 浮动音乐播放器 ---------- */
+
+.music-player {
+  position: fixed;
+  right: 22px;
+  bottom: 22px;
+  z-index: 100;
+  width: min(390px, calc(100vw - 32px));
+  color: var(--ink);
+  background: rgba(250, 250, 247, 0.94);
+  border: 1px solid var(--line-strong);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 8px 30px rgba(26, 26, 31, 0.10);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.music-main {
+  display: grid;
+  grid-template-columns: 30px 38px 30px 1fr 62px 24px;
+  align-items: center;
+  gap: 5px;
+  padding: 9px 10px 8px;
+}
+
+.music-icon-btn,
+.music-play,
+.music-toggle {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: var(--ink-soft);
+  cursor: pointer;
+  font-family: var(--sans);
+}
+
+.music-icon-btn {
+  font-size: 22px;
+  line-height: 1;
+}
+
+.music-play {
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--line-strong);
+  border-radius: 50%;
+  font-size: 12px;
+}
+
+.music-play:hover,
+.music-icon-btn:hover,
+.music-toggle:hover {
+  color: var(--accent);
+}
+
+.music-play:disabled,
+.music-icon-btn:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.music-info {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.music-label {
+  font-size: 9px;
+  letter-spacing: 0.16em;
+  color: var(--accent-soft);
+}
+
+.music-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--serif-cn);
+  font-size: 12px;
+}
+
+.music-progress,
+.music-volume {
+  width: 100%;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+.music-progress {
+  height: 8px;
+  margin: 1px 0 0;
+}
+
+.music-volume {
+  height: 8px;
+}
+
+.music-toggle {
+  font-size: 18px;
+  line-height: 1;
+}
+
+.music-player.is-collapsed {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  right: 18px;
+  bottom: 18px;
+}
+
+.music-player.is-collapsed .music-main {
+  display: flex;
+  justify-content: center;
+  padding: 0;
+  height: 40px;
+}
+
+.music-player.is-collapsed .music-main > :not(.music-toggle) {
+  display: none;
+}
+
+.music-player.is-collapsed .music-toggle {
+  width: 40px;
+  height: 40px;
+  font-size: 20px;
+}
+
+body.reader-page .music-player {
+  color: var(--paper);
+  background: rgba(26, 26, 31, 0.94);
+  border-color: #4A4A50;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+}
+
+body.reader-page .music-icon-btn,
+body.reader-page .music-play,
+body.reader-page .music-toggle {
+  color: #C9C7C0;
+}
+
+body.reader-page .music-play {
+  border-color: #4A4A50;
+}
+
+body.reader-page .music-title {
+  color: var(--paper);
+}
+
+@media (max-width: 560px) {
+  .music-player {
+    right: 12px;
+    bottom: 12px;
+    width: calc(100vw - 24px);
+  }
+
+  .music-main {
+    grid-template-columns: 28px 36px 28px 1fr 48px 22px;
+  }
+
+  .music-volume {
+    display: none;
+  }
+}
+
+/* ---------- 日漫画阅读器：右 → 左 ---------- */
+body.reader-page { background: #17171a; color: var(--paper); overflow-x: hidden; }
+.reader-bar { position: sticky; top: 0; z-index: 50; background: rgba(23,23,26,.94); backdrop-filter: blur(10px); }
+
+/*
+ * 阅读区域严格占据“顶部工具栏以下”的整个视口。
+ * 图片使用 max-width + max-height 同时限制，因此无论横图、竖图、
+ * 手机还是桌面屏幕，都不会被顶部工具栏遮住。
+ */
+.reader-stage.paged {
+  direction: rtl;
+  width: 100%;
+  height: calc(100vh - 55px);
+  min-height: 0;
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.reader-stage.paged .page-img {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  box-shadow: 0 8px 32px rgba(0,0,0,.28);
+}
+
+.tap-zone { z-index: 2; }
+.tap-zone.prev { left: 0; right: auto; cursor: w-resize; }
+.tap-zone.next { right: 0; left: auto; cursor: e-resize; }
+.reading-direction { font-size:11px; letter-spacing:.08em; color:#aaa8a1; padding-left:8px; }
+.reader-end { direction:ltr; }
+
+@media (max-width:700px) {
+  .reader-stage.paged {
+    height: calc(100vh - 55px);
+    padding: 6px 8px;
+  }
+  .reader-stage.paged .page-img {
+    max-width: 100%;
+    max-height: 100%;
+  }
+}
+
+@media (max-height:500px) {
+  .reader-stage.paged { height: calc(100vh - 50px); }
+}
+
+/* =========================================================
+   漫画阅读器最终布局修复
+   标题栏不遮挡图片
+   图片不允许上下滚动
+   图片始终完整显示在标题栏以下
+   ========================================================= */
+
+html,
+body.reader-page {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+}
+
+body.reader-page {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-height: 100vh;
+}
+
+/* ---------- 顶部标题栏 ---------- */
+
+body.reader-page .reader-bar {
+  position: relative;
+  top: auto;
+  left: auto;
+  right: auto;
+
+  flex: 0 0 auto;
+  z-index: 20;
+
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* ---------- 漫画阅读区域 ---------- */
+
+body.reader-page .reader-stage {
+  position: relative;
+
+  flex: 1 1 auto;
+  min-height: 0;
+  height: auto;
+
+  width: 100%;
+  box-sizing: border-box;
+
+  overflow: hidden;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ---------- 单页阅读 ---------- */
+
+body.reader-page .reader-stage.paged {
+  overflow: hidden;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+  margin: 0;
+
+  direction: rtl;
+}
+
+/* ---------- 漫画图片 ---------- */
+
+body.reader-page .reader-stage.paged img,
+body.reader-page .reader-stage.paged .page-img {
+  display: block;
+
+  width: auto;
+  height: auto;
+
+  max-width: 100%;
+  max-height: 100%;
+
+  object-fit: contain;
+  object-position: center center;
+
+  margin: auto;
+}
+
+/* ---------- 防止图片本身产生滚动 ---------- */
+
+body.reader-page .reader-stage img {
+  overflow: hidden;
+}
+
+/* ---------- 点击翻页区域 ---------- */
+
+body.reader-page .tap-zone {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+
+  z-index: 10;
+}
+
+body.reader-page .tap-zone.prev {
+  left: 0;
+  right: 50%;
+}
+
+body.reader-page .tap-zone.next {
+  left: 50%;
+  right: 0;
+}
+
+/* ---------- 阅读页禁止页面滚动 ---------- */
+
+body.reader-page,
+body.reader-page html {
+  overflow: hidden !important;
+}
+
+/* ---------- 连续滚动模式 ---------- */
+
+body.reader-page .reader-stage.scroll {
+  display: block;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/*
+   如果使用连续滚动模式，则允许这里滚动。
+   单页模式不会滚动。
+*/
+body.reader-page .reader-stage.scroll img {
+  display: block;
+  width: auto;
+  max-width: 100%;
+  height: auto;
+  margin: 0 auto;
+}

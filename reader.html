@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>阅读 · 備忘録</title>
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body class="reader-page" data-page="reader">
+
+<div class="reader-bar">
+  <a href="index.html" id="reader-back">← 系列</a>
+  <p class="reader-title" id="reader-title">加载中…</p>
+  <div class="reader-controls">
+    <span class="page-indicator" id="page-indicator"></span><span class="reading-direction">右→左</span>
+    <button class="mode-toggle" id="mode-toggle" type="button" aria-pressed="false">
+      连续滚动
+    </button>
+  </div>
+</div>
+
+<div class="reader-stage paged" id="reader-stage">
+  <!-- 由 render-reader.js 填充 -->
+</div>
+
+
+<!-- 音乐播放器 -->
+<div class="music-player" id="music-player">
+  <audio id="music-audio" preload="metadata"></audio>
+  <div class="music-main">
+    <button class="music-icon-btn" id="music-prev" type="button" aria-label="上一首">‹</button>
+    <button class="music-play" id="music-play" type="button" aria-label="播放">▶</button>
+    <button class="music-icon-btn" id="music-next" type="button" aria-label="下一首">›</button>
+    <div class="music-info">
+      <span class="music-label">MUSIC</span>
+      <span class="music-title" id="music-title">暂无音乐</span>
+      <input class="music-progress" id="music-progress" type="range" min="0" max="100" value="0" step="0.1" aria-label="播放进度">
+    </div>
+    <input class="music-volume" id="music-volume" type="range" min="0" max="1" value="0.7" step="0.01" aria-label="音量">
+    <button class="music-toggle" id="music-toggle" type="button" aria-label="收起音乐播放器">×</button>
+  </div>
+</div>
+
+<script src="assets/js/music-player.js"></script>
+<script src="assets/js/data.js"></script>
+<script src="assets/js/render-reader.js"></script>
+</body>
+</html>
