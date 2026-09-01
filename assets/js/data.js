@@ -3,7 +3,7 @@ const MANGA_DATA = {
     {
       id: "arcadia",
       title: "【やとさきはる】两人的理想世界",
-      original: "两人的理想世界 / やとさきはる",
+      original: "二人のアルカディア",
       author: "やとさきはる",
       tags: ["百合"],
       cover: "assets/img/covers/二人のアルカディア【合本版】 - 001.jpg",
@@ -43,9 +43,12 @@ function findSeries(seriesId) {
 // 根据系列 id + 话 id 查找章节
 function findChapter(seriesId, chapterId) {
   const series = findSeries(seriesId);
+
   if (!series) return null;
 
-  const chapter = series.chapters.find((c) => c.id === chapterId);
+  const chapter = series.chapters.find(
+    (c) => c.id === chapterId
+  );
 
   return chapter ? { series, chapter } : null;
 }
@@ -56,10 +59,10 @@ function chapterPageUrls(seriesId, chapter) {
   const urls = [];
 
   for (let i = 1; i <= chapter.pageCount; i++) {
-    const n = String(i).padStart(2, "0");
+    const n = String(i).padStart(3, "0");
 
     urls.push(
-      `assets/img/pages/${seriesId}/${chapter.id}/p${n}.jpg`
+      `assets/img/pages/${seriesId}/${chapter.id}/二人のアルカディア【合本版】 - ${n}.jpg`
     );
   }
 
