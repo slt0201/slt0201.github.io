@@ -13,7 +13,7 @@
 const MANGA_DATA = {
   series: [
     {
-      id: "【やとさきはる】两人的理想世界",
+      id: "arcadia",
       title: "【やとさきはる】两人的理想世界 #1",
       original: "两人的理想世界 / やとさきはる",
       author: "やとさきはる",
@@ -23,69 +23,25 @@ const MANGA_DATA = {
         "简介",
       chapters: [
         {
-          id: "【やとさきはる】两人的理想世界 #1",
+          id: "arcadiamain2",
           title: "两人的理想世界 #1",
           pageCount: 24,
           date: "2026-08-04",
         },
         {
-          id: "【やとさきはる】两人的理想世界 #2",
+          id: "arcadiamain2",
           title: "两人的理想世界 #2",
           pageCount: 20,
           date: "2026-08-08",
         },
         {
-          id: "【やとさきはる】两人的理想世界 #3",
+          id: "arcadiamain3",
           title: "两人的理想世界 #3",
           pageCount: 20,
           date: "2026-08-11",
         },
       ],
     },
-    {
-      id: "s02",
-      title: "潮见坂",
-      original: "潮見坂",
-      author: "示例原作 · 汉化：你自己",
-      tags: ["百合", "长篇连载"],
-      cover: "assets/img/covers/s02.svg",
-      description:
-        "坡道尽头能看见海的小镇，两个转学生的连载故事。示例数据，替换为你自己的作品简介。",
-      chapters: [
-        {
-          id: "c01",
-          title: "第1话　转学生",
-          pageCount: 6,
-          date: "2026-05-20",
-        },
-        {
-          id: "c02",
-          title: "第2话　放学后",
-          pageCount: 5,
-          date: "2026-06-15",
-        },
-      ],
-    },
-    {
-      id: "s03",
-      title: "室内乐",
-      original: "室内楽",
-      author: "示例原作 · 汉化：你自己",
-      tags: ["百合", "单行本"],
-      cover: "assets/img/covers/s03.svg",
-      description:
-        "音乐教室里的单行本短篇。示例数据，替换为你自己的作品简介。",
-      chapters: [
-        {
-          id: "c01",
-          title: "第1话",
-          pageCount: 4,
-          date: "2026-04-01",
-        },
-      ],
-    },
-  ],
-};
 
 // 根据 id 查找系列
 function findSeries(seriesId) {
