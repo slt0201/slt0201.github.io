@@ -9,6 +9,8 @@ const MANGA_DATA = {
       cover: "assets/img/covers/二人のアルカディア【合本版】 - 001.jpg",
       description: "老漫画挖坟",
 
+      pagePrefix: "二人のアルカ迪亚【合本版】 - ",
+
       chapters: [
         {
           id: "arcadiamain1",
@@ -46,6 +48,14 @@ const MANGA_DATA = {
           title: "教室 #1",
           pageCount: 21,
           date: "2026-08-31",
+
+          // 教室这一话的实际文件名
+          pages: [
+            "083.jpg",
+            "085.jpg",
+            "086.jpg",
+            // 继续在这里填写剩下的文件名
+          ],
         },
       ],
     },
@@ -73,15 +83,28 @@ function findChapter(seriesId, chapterId) {
 }
 
 
-// 生成某一话的图片路径列表
+// 生成图片路径
 function chapterPageUrls(seriesId, chapter) {
+  const series = findSeries(seriesId);
+
+  if (!series) return [];
+
+  // 如果章节自己指定了文件名，就使用指定的文件名
+  if (chapter.pages) {
+    return chapter.pages.map(
+      (filename) =>
+        `assets/img/pages/${seriesId}/${chapter.id}/${filename}`
+    );
+  }
+
+  // 普通连续编号漫画
   const urls = [];
 
   for (let i = 1; i <= chapter.pageCount; i++) {
     const n = String(i).padStart(3, "0");
 
     urls.push(
-      `assets/img/pages/${seriesId}/${chapter.id}/二人のアルカディア【合本版】 - ${n}.jpg`
+      `assets/img/pages/${seriesId}/${chapter.id}/${series.pagePrefix}${n}.jpg`
     );
   }
 
