@@ -35,7 +35,7 @@ series: [
     title: "教室",
     original: "教室",
     author: "森永みるく",
-    tags: [百合],
+    tags: ["百合"],
     cover: "assets/img/covers/083",
     description: "季刊ガレツト",
 
@@ -46,5 +46,6 @@ series: [
         pageCount: 21,
         date: "2026-08-31",
       },
+    ],
   },
 ],
