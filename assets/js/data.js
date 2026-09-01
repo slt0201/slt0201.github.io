@@ -31,7 +31,7 @@ series: [
   },
 
   {
-    id: "classroom",
+    id: "cr",
     title: "教室",
     original: "教室",
     author: "森永みるく",
