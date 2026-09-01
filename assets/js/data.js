@@ -39,6 +39,7 @@ function findSeries(seriesId) {
   return MANGA_DATA.series.find((s) => s.id === seriesId);
 }
 
+
 // 根据系列 id + 话 id 查找章节
 function findChapter(seriesId, chapterId) {
   const series = findSeries(seriesId);
@@ -49,6 +50,7 @@ function findChapter(seriesId, chapterId) {
   return chapter ? { series, chapter } : null;
 }
 
+
 // 生成某一话的图片路径列表
 function chapterPageUrls(seriesId, chapter) {
   const urls = [];
@@ -57,7 +59,7 @@ function chapterPageUrls(seriesId, chapter) {
     const n = String(i).padStart(2, "0");
 
     urls.push(
-      `assets/img/pages/${seriesId}/${chapter.id}/p${n}.svg`
+      `assets/img/pages/${seriesId}/${chapter.id}/p${n}.jpg`
     );
   }
 
