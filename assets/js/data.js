@@ -2,7 +2,7 @@ const MANGA_DATA = {
   series: [
     {
       id: "arcadia",
-      title: "【やとさきはる】两人的理想世界 #1",
+      title: "【やとさきはる】两人的理想世界",
       original: "两人的理想世界 / やとさきはる",
       author: "やとさきはる",
       tags: ["百合"],
